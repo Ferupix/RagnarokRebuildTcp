@@ -850,12 +850,14 @@ namespace Assets.Scripts
             {
                 if (closestAnim.State == SpriteState.Dead && closestAnim.Type != SpriteType.Player)
                     return null;
+                if (closestAnim.CanBeTargetedWhileHidden)
+                    return closestAnim;
                 if (closestAnim.IsHidden)
                     return null;
                 return closestAnim;
             }
 
-            var isOk = closestAnim.State != SpriteState.Dead && !closestAnim.IsHidden;
+            var isOk = closestAnim.State != SpriteState.Dead && (!closestAnim.IsHidden || closestAnim.CanBeTargetedWhileHidden);
             var isAlly = closestAnim.Controllable.IsAlly;
             var wantDead = hasSkillOnCursor && cursorSkill == CharacterSkill.Resurrection;
             var hitLastTarget = closestAnim.Controllable != null && closestAnim.Controllable == LastTargetedEnemy;

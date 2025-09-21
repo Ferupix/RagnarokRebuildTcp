@@ -217,6 +217,11 @@ Revives 1 dead player. Player returns to life with 10% Max Hp at level 1, increa
 Cast Time: [8 - SkillLvl * 2]s
 Catalyst: <color=#777777>1 Blue Gemstone</color>
 
+::StatueOfGoddessVakarine
+Carve a statue of Vakarine, the Goddess of the Evening Star. You may warp to other areas through the Goddess Statue.
+
+::StatueOfGoddessCarveOwl
+Carve an Owl Sculpture to watch over you, attacking enemies nearby.
 
 //----------------Thief-------------------
 

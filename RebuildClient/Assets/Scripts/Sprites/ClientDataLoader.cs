@@ -1001,7 +1001,8 @@ namespace Assets.Scripts.Sprites
             control.IsInteractable = false;
 
             control.ConfigureEntity(param.ServerId, param.Position, param.Facing);
-            if (type < NpcEffectType.AnkleSnare || type > NpcEffectType.ShockwaveTrap)
+
+            if ((type < NpcEffectType.AnkleSnare || type > NpcEffectType.ShockwaveTrap) && type != NpcEffectType.StatueOfGoddessVakarine && type != NpcEffectType.StatueOfGoddessCarveOwl)
             {
                 obj.AddComponent<BillboardObject>();
                 obj.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
@@ -1083,6 +1084,18 @@ namespace Assets.Scripts.Sprites
                 case NpcEffectType.TalkieBox:
                     AttachPrefabToControllable(control, "Assets/Effects/Prefabs/ModelTalkieBox.prefab");
                     break;
+                case NpcEffectType.StatueOfGoddessWoodBlock:
+                    break;
+                case NpcEffectType.StatueOfGoddessVakarine:
+                    StatueOfGoddessEffect.LaunchStatueOfGoddess(obj);
+                    AttachPrefabToControllable(control, "Assets/Effects/Prefabs/StatueOfGoddessVakarine.prefab");
+                    break;
+                    case NpcEffectType.StatueOfGoddessCarveOwl:
+                    StatueOfGoddessEffect.LaunchStatueOfGoddess(obj);
+                    AttachPrefabToControllable(control, "Assets/Effects/Prefabs/StatueOfGoddessCarveOwl.prefab");
+                    //DummyGroundEffect.Create(obj, "StatueOfGoddess");
+                    break;
+                    
             }
 
             return control;

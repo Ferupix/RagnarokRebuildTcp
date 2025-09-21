@@ -57,6 +57,7 @@ public class Player : IEntityAutoReset
         set;
     } = new();
     [EntityIgnoreNullCheck] public MapMemoLocation[] MemoLocations = new MapMemoLocation[4];
+    [EntityIgnoreNullCheck] public List<KeyValuePair<CharacterSkill, Position>>? SpawnedAoes { get; set; }
     [EntityIgnoreNullCheck] public List<SkillCastInfo> IndirectCastQueue { get; set; } = null!;
     [EntityIgnoreNullCheck] public Dictionary<int, int>? AttackVersusTag { get; set; }
     [EntityIgnoreNullCheck] public Dictionary<int, int>? ResistVersusTag { get; set; }
@@ -314,6 +315,9 @@ public class Player : IEntityAutoReset
 
         if (IndirectCastQueue == null!)
             IndirectCastQueue = new List<SkillCastInfo>(4);
+
+        if (SpawnedAoes == null!)
+            SpawnedAoes = new List<KeyValuePair<CharacterSkill, Position>>();
 
         SetStat(CharacterStat.Level, GetData(PlayerStat.Level));
         Character.DisplayType = CharacterDisplayType.Player;

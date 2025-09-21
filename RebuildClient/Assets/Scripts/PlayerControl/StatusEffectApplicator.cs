@@ -11,6 +11,7 @@ using Assets.Scripts.Objects;
 using Assets.Scripts.Sprites;
 using RebuildSharedData.Enum;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 namespace Assets.Scripts.PlayerControl
 {
@@ -95,29 +96,30 @@ namespace Assets.Scripts.PlayerControl
                 if(UiManager.Instance.PartyPanel.PartyEntryLookup.TryGetValue(partyMemberId, out var panel))
                     panel.AddStatusEffect(status, duration);
             }
-            
+
+            Debug.Log($"AddStatusToTarget {status.ToString()}");
             switch (status)
             {
                 case CharacterStatusEffect.PushCart:
-                {
-                    var go = new GameObject();
-                    var cart = go.AddComponent<CartFollower>();
-                    cart.AttachCart(controllable, 0);
-                    controllable.FollowerObject = go;
-                    break;
-                }
+                    {
+                        var go = new GameObject();
+                        var cart = go.AddComponent<CartFollower>();
+                        cart.AttachCart(controllable, 0);
+                        controllable.FollowerObject = go;
+                        break;
+                    }
                 case CharacterStatusEffect.Hiding:
                 case CharacterStatusEffect.Cloaking:
                 case CharacterStatusEffect.Invisible:
                     controllable.SpriteAnimator.IsHidden = true;
                     controllable.SpriteAnimator.HideShadow = !controllable.IsMainCharacter;
-                    if(controllable.FollowerObject != null)
+                    if (controllable.FollowerObject != null)
                         controllable.FollowerObject.SetActive(false); //hide cart, bird, whatever is following the player
                     if (controllable.CharacterType != CharacterType.Player)
                         controllable.HideHpBar();
                     if (controllable.CharacterType == CharacterType.Player && !controllable.IsMainCharacter)
                     {
-                        if(!PlayerState.Instance.IsInParty || PlayerState.Instance.PartyName != controllable.PartyName)
+                        if (!PlayerState.Instance.IsInParty || PlayerState.Instance.PartyName != controllable.PartyName)
                             controllable.HideHpBar();
                     }
                     if (CameraFollower.Instance.SelectedTarget == controllable)
@@ -139,12 +141,12 @@ namespace Assets.Scripts.PlayerControl
                     break;
                 case CharacterStatusEffect.Poison:
                     //color now set via UpdateColorForStatus
-                    if(!isNewEntity)
+                    if (!isNewEntity)
                         AudioManager.Instance.AttachSoundToEntity(controllable.Id, "_poison.ogg", controllable.gameObject);
                     break;
                 case CharacterStatusEffect.Silence:
                     controllable.AttachEffect(SilenceEffect.LaunchSilenceEffect(controllable, 999));
-                    if(!isNewEntity)
+                    if (!isNewEntity)
                         AudioManager.Instance.AttachSoundToEntity(controllable.Id, "_silence.ogg", controllable.gameObject);
                     break;
                 case CharacterStatusEffect.Frozen:
@@ -152,7 +154,7 @@ namespace Assets.Scripts.PlayerControl
                     controllable.AbortActiveWalk();
                     controllable.SpriteAnimator?.PauseAnimation();
                     FreezeEffect.AttachFreezeEffect(controllable);
-                    if(!isNewEntity)
+                    if (!isNewEntity)
                         AudioManager.Instance.OneShotSoundEffect(controllable.Id, "_stonecurse.ogg", controllable.transform.position, 0.8f);
                     break;
                 case CharacterStatusEffect.Curse:
@@ -160,7 +162,7 @@ namespace Assets.Scripts.PlayerControl
                     CurseEffect.AttachCurseEffect(controllable);
                     break;
                 case CharacterStatusEffect.PowerUp:
-                    var powerUp = ExplosiveAuraEffect.AttachExplosiveAura(controllable.gameObject, 2, new Color(1f, 20/255f, 20/255f));
+                    var powerUp = ExplosiveAuraEffect.AttachExplosiveAura(controllable.gameObject, 2, new Color(1f, 20 / 255f, 20 / 255f));
                     controllable.AttachEffect(powerUp);
                     break;
                 case CharacterStatusEffect.Blind:
@@ -178,22 +180,22 @@ namespace Assets.Scripts.PlayerControl
                     }
                     else
                     {
-                        if(!isNewEntity)
+                        if (!isNewEntity)
                             AudioManager.Instance.AttachSoundToEntity(controllable.Id, "_blind.ogg", CameraFollower.Instance.ListenerProbe, 0.8f); //quieter
                     }
 
                     break;
                 case CharacterStatusEffect.Hallucination:
-                    if(controllable.IsMainCharacter)
+                    if (controllable.IsMainCharacter)
                         CameraFollower.Instance.GetComponent<ScreenEffectHandler>().StartHallucination();
                     break;
                 case CharacterStatusEffect.Sight:
-                    if(!isNewEntity)
+                    if (!isNewEntity)
                         AudioManager.Instance.OneShotSoundEffect(controllable.Id, $"ef_sight.ogg", controllable.transform.position);
                     controllable.AttachEffect(SightEffect.LaunchSight(controllable));
                     break;
                 case CharacterStatusEffect.Ruwach:
-                    if(!isNewEntity)
+                    if (!isNewEntity)
                         AudioManager.Instance.OneShotSoundEffect(controllable.Id, $"ef_sight.ogg", controllable.transform.position);
                     controllable.AttachEffect(RuwachEffect.LaunchRuwach(controllable));
                     break;
@@ -219,38 +221,83 @@ namespace Assets.Scripts.PlayerControl
                     var effect = SpecialTargetMarkerEffect.Create(controllable, duration);
                     controllable.AttachEffect(effect);
                     break;
+                case CharacterStatusEffect.WoodBlock1:
+                    AttachPrefabToControllableWithOffset(controllable, "Assets/Effects/Prefabs/StatueWood_1.prefab", Vector3.zero);
+                    break;
+                case CharacterStatusEffect.WoodBlock2:
+                    AttachPrefabToControllableWithOffset(controllable, "Assets/Effects/Prefabs/StatueWood_2.prefab", Vector3.zero);
+                    break;
+                case CharacterStatusEffect.WoodBlock3:
+                    AttachPrefabToControllableWithOffset(controllable, "Assets/Effects/Prefabs/StatueWood_3.prefab", Vector3.zero);
+                    break;
             }
+        }
+
+        private static void AttachPrefabToControllableWithOffset(ServerControllable target, string prefabName, Vector3 offset)
+        {
+            var loader = Addressables.LoadAssetAsync<GameObject>(prefabName);
+            loader.Completed += ah =>
+            {
+                if (target != null && target.gameObject.activeInHierarchy)
+                {
+                    var obj2 = GameObject.Instantiate(ah.Result, target.transform, false);
+                    obj2.transform.localPosition = offset;
+                    obj2.transform.rotation = Quaternion.Euler(0f, RoAnimationHelper.FacingDirectionToRotation(Direction.South), 0f); // ToDo: Remove this and move above to localpositon + offset? Is FacingDirection even needed?
+
+                    var sprite = obj2.GetComponent<RoSpriteAnimator>();
+                    if (sprite != null)
+                        sprite.Controllable = target;
+                    target.EntityObject = obj2;
+
+                    // Remove billboard from 3D prefabs
+                    GameObject.Destroy(target.gameObject.GetComponent<BillboardObject>());
+                }
+            };
+
+            // Hide sprite and set as targetable while hidden
+            RoSpriteAnimator roa = target.gameObject.transform.GetChild(0).GetComponent<RoSpriteAnimator>();
+            roa.IsHidden = true;
+            roa.CanBeTargetedWhileHidden = true;
+        }
+
+        private static void DetachPrefabFromControllable(ServerControllable target)
+        {
+            var go2 = target.EntityObject;
+            if (go2 == null)
+                return;
+
+            GameObject.Destroy(go2);
         }
 
         public static void RemoveStatusFromTarget(ServerControllable controllable, CharacterStatusEffect status)
         {
             controllable.StatusEffectState?.activeStatusEffects.Remove(status);
-            
+
             UpdateColorForStatus(controllable);
 
             // Debug.Log($"Character {controllable.DisplayName} loses status {status}");
-            
+
             if (controllable.CharacterType == CharacterType.Player && PlayerState.Instance.IsInParty &&
                 PlayerState.Instance.PartyMemberIdLookup.TryGetValue(controllable.Id, out var partyMemberId))
             {
-                if(UiManager.Instance.PartyPanel.PartyEntryLookup.TryGetValue(partyMemberId, out var panel))
+                if (UiManager.Instance.PartyPanel.PartyEntryLookup.TryGetValue(partyMemberId, out var panel))
                     panel.RemoveStatusEffect(status);
             }
 
             switch (status)
             {
                 case CharacterStatusEffect.PushCart:
-                {
-                    if (controllable.FollowerObject != null)
-                        GameObject.Destroy(controllable.FollowerObject);
-                    break;
-                }
+                    {
+                        if (controllable.FollowerObject != null)
+                            GameObject.Destroy(controllable.FollowerObject);
+                        break;
+                    }
                 case CharacterStatusEffect.Hiding:
                 case CharacterStatusEffect.Cloaking:
                 case CharacterStatusEffect.Invisible:
                     controllable.SpriteAnimator.IsHidden = false;
                     controllable.SpriteAnimator.HideShadow = false;
-                    if(controllable.FollowerObject != null)
+                    if (controllable.FollowerObject != null)
                         controllable.FollowerObject.SetActive(true); //unhide cart/bird
                     HideEffect.AttachHideEffect(controllable.gameObject); //smoke plays when unhiding too
                     break;
@@ -279,18 +326,18 @@ namespace Assets.Scripts.PlayerControl
                 case CharacterStatusEffect.Frozen:
                     controllable.SpriteAnimator.Unpause();
                     var freeze = controllable.GetExistingEffectOfType(EffectType.Freeze);
-                    if(freeze != null)
+                    if (freeze != null)
                         freeze.EffectHandler.OnEvent(freeze, null);
                     break;
                 case CharacterStatusEffect.PowerUp:
                     controllable.EndEffectOfType(EffectType.ExplosiveAura);
                     break;
                 case CharacterStatusEffect.Blind:
-                    if(controllable.IsMainCharacter)
+                    if (controllable.IsMainCharacter)
                         CameraFollower.Instance.IsBlindActive = false;
                     break;
                 case CharacterStatusEffect.Hallucination:
-                    if(controllable.IsMainCharacter)
+                    if (controllable.IsMainCharacter)
                         CameraFollower.Instance.GetComponent<ScreenEffectHandler>().EndHallucination();
                     break;
                 case CharacterStatusEffect.Sight:
@@ -308,7 +355,7 @@ namespace Assets.Scripts.PlayerControl
                     {
                         controllable.SpriteAnimator.ForceLoop = false;
                         var cm = controllable.SpriteAnimator.CurrentMotion;
-                        if(cm != SpriteMotion.Walk && cm != SpriteMotion.Dead)
+                        if (cm != SpriteMotion.Walk && cm != SpriteMotion.Dead)
                             controllable.SpriteAnimator.ChangeMotion(SpriteMotion.Idle, true);
                     }
 
@@ -321,10 +368,15 @@ namespace Assets.Scripts.PlayerControl
                     break;
                 case CharacterStatusEffect.SpecialTarget:
                     var targeter = controllable.DetachExistingEffectOfType(EffectType.SpecialTargetMarker);
-                    if(targeter != null)
+                    if (targeter != null)
                         ((SpecialMarkerData)targeter.EffectData).IsEnding = true;
                     var cast = controllable.DetachExistingEffectOfType(EffectType.CastLockOn);
                     cast?.SetRemainingDurationByFrames(30);
+                    break;
+                case CharacterStatusEffect.WoodBlock1:
+                case CharacterStatusEffect.WoodBlock2:
+                case CharacterStatusEffect.WoodBlock3:
+                    DetachPrefabFromControllable(controllable);
                     break;
             }
         }

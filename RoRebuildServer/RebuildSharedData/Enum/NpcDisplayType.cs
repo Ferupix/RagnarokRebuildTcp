@@ -21,6 +21,9 @@ public enum NpcEffectType : byte
     WaterBall,
     Sanctuary,
     MagnusExorcismus,
+    StatueOfGoddessWoodBlock,
+    StatueOfGoddessVakarine,
+    StatueOfGoddessCarveOwl,
 
     //traps
     AnkleSnare,

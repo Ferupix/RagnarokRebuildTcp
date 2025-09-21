@@ -1,4 +1,4 @@
-﻿Id,Name,ImportEffect,Billboard,HasPrimitive,StrFile,Sprite,SoundFile,Offset,PrefabName,Flags
+Id,Name,ImportEffect,Billboard,HasPrimitive,StrFile,Sprite,SoundFile,Offset,PrefabName,Flags
 0,RedPotion,TRUE,TRUE,FALSE,빨간포션,,_heal_effect,-0.1,,
 1,OrangePotion,TRUE,TRUE,FALSE,주홍포션,,_heal_effect,-0.1,,
 2,YellowPotion,TRUE,TRUE,FALSE,노란포션,,_heal_effect,-0.1,,
@@ -125,3 +125,5 @@
 124,ImpositioManus,TRUE,TRUE,FALSE,impositio,,,0,,
 125,LexAeterna,TRUE,TRUE,FALSE,lexaeterna,,,0,,
 126,LexDivina,TRUE,TRUE,FALSE,lexdivina,,,0,,
+900,StatueOfGoddessVakarine,FALSE,FALSE,FALSE,,,,0,Assets/Prefabs/TempGroundObject.prefab,
+901,StatueOfGoddessCarveOwl,FALSE,FALSE,FALSE,,,,0,Assets/Prefabs/TempGroundObject.prefab,

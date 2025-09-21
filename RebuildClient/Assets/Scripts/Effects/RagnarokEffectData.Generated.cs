@@ -56,6 +56,7 @@ namespace Assets.Scripts.Effects
 		LordOfVermilion,
 		WaterBallAttack,
 		WaterBallRise,
+		StatueOfGoddess,
 		Aspersio,
 		ImpositioManus,
 		LexAeterna,
@@ -160,6 +161,7 @@ namespace Assets.Scripts.Effects
 			effectHandlers.Add(EffectType.LordOfVermilion, new Assets.Scripts.Effects.EffectHandlers.Skills.LordOfVermilionEffect());
 			effectHandlers.Add(EffectType.WaterBallAttack, new Assets.Scripts.Effects.EffectHandlers.Skills.WaterBallAttackEffect());
 			effectHandlers.Add(EffectType.WaterBallRise, new Assets.Scripts.Effects.EffectHandlers.Skills.WaterBallRiseEffect());
+			effectHandlers.Add(EffectType.StatueOfGoddess, new Assets.Scripts.Effects.EffectHandlers.Skills.StatueOfGoddessEffect());
 			effectHandlers.Add(EffectType.Aspersio, new Assets.Scripts.Effects.EffectHandlers.Skills.Priest.AspersioEffect());
 			effectHandlers.Add(EffectType.ImpositioManus, new Assets.Scripts.Effects.EffectHandlers.Skills.Priest.ImpositioEffect());
 			effectHandlers.Add(EffectType.LexAeterna, new Assets.Scripts.Effects.EffectHandlers.Skills.Priest.LexAeternaEffect());

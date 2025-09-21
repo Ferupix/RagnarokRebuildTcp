@@ -26,7 +26,8 @@ public class AreaOfEffectPoolPolicy : IPooledObjectPolicy<AreaOfEffect>
 public enum AoEClass
 {
     None,
-    Trap
+    Trap,
+    StatueOfGoddess
 }
 
 public class AreaOfEffect

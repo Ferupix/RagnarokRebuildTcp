@@ -405,3 +405,21 @@ Name = "Stolen From"
 Type = "Debuff"
 CanDisable = false
 CanDispel = false
+
+[WoodBlock1]
+Name = "Wood Block 1"
+Type = "Debuff"
+CanDisable = false
+CanDispel = false
+
+[WoodBlock2]
+Name = "Wood Block 2"
+Type = "Debuff"
+CanDisable = false
+CanDispel = false
+
+[WoodBlock3]
+Name = "Wood Block 3"
+Type = "Debuff"
+CanDisable = false
+CanDispel = false

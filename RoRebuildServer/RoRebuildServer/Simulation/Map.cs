@@ -1390,7 +1390,7 @@ public class Map
         {
             foreach (var a in chunk.AreaOfEffects)
             {
-                if (a.Class == AoEClass.Trap && area.Overlaps(a.Area))
+                if ((a.Class == AoEClass.Trap || a.Class == AoEClass.StatueOfGoddess) && area.Overlaps(a.Area))
                     return true;
             }
 

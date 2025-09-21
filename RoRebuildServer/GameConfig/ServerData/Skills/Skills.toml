@@ -368,6 +368,20 @@ Target = "Enemy"
 MaxLevel = 1
 SpCost = [15]
 
+[StatueOfGoddessVakarine]
+Name = "Statue of Goddess Vakarine"
+Icon = "al_StatueOfGoddessVakarine"
+Target = "Ground"
+MaxLevel = 1
+SpCost = [10]
+
+[StatueOfGoddessCarveOwl]
+Name = "Carve Owl"
+Icon = "al_StatueOfGoddessCarveOwl"
+Target = "Ground"
+MaxLevel = 3
+SpCost = [10,15,20]
+
 #----------------------------------
 # Thief
 #----------------------------------

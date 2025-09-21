@@ -71,6 +71,8 @@ Pneuma = [["WarpPortal", 4]]
 HolyLight = [["DemonBane", 1]]
 SignumCrusis = [["DemonBane", 3]]
 AquaBenedicta = []
+StatueOfGoddessVakarine = []
+StatueOfGoddessCarveOwl = []
 
 [Thief]
 JobRank = 1
