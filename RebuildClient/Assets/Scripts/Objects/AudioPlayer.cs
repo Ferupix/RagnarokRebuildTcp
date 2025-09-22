@@ -124,7 +124,16 @@ namespace Assets.Scripts.Objects
             audioSource.clip = null;
             audioSource.Stop();
 
-            var path = "Assets/Sounds/Effects/" + filename;
+            var path = "";
+            if (filename.Contains("_ToS"))
+            {
+                path = "Assets/Sounds/" + filename; 
+            }
+            else
+            {
+                path = "Assets/Sounds/Effects/" + filename;
+            }
+            
             // Debug.Log(path);
 
             loadHandle = AddressableUtility.Load<AudioClip>(gameObject, path, OnFinishLoad);

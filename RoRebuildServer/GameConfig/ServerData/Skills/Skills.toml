@@ -382,6 +382,14 @@ Target = "Ground"
 MaxLevel = 3
 SpCost = [10,15,20]
 
+[HealCleric]
+Name = "Heal Cleric"
+Icon = "al_cler_heal"
+Target = "Ground"
+MaxLevel = 6
+SpCost = [15,20,25,30,35,40]
+AdjustableLevel = true
+
 #----------------------------------
 # Thief
 #----------------------------------

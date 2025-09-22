@@ -223,6 +223,9 @@ Carve a statue of Vakarine, the Goddess of the Evening Star. You may warp to oth
 ::StatueOfGoddessCarveOwl
 Carve an Owl Sculpture to watch over you, attacking enemies nearby.
 
+::HealCleric
+Ground Healing Tiles.
+
 //----------------Thief-------------------
 
 ::DoubleAttack

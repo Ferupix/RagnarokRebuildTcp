@@ -125,5 +125,6 @@ Id,Name,ImportEffect,Billboard,HasPrimitive,StrFile,Sprite,SoundFile,Offset,Pref
 124,ImpositioManus,TRUE,TRUE,FALSE,impositio,,,0,,
 125,LexAeterna,TRUE,TRUE,FALSE,lexaeterna,,,0,,
 126,LexDivina,TRUE,TRUE,FALSE,lexdivina,,,0,,
+800,HealCleric,TRUE,TRUE,FALSE,magnus,,priest_sanctuary,1,,
 900,StatueOfGoddessVakarine,FALSE,FALSE,FALSE,,,,0,Assets/Prefabs/TempGroundObject.prefab,
 901,StatueOfGoddessCarveOwl,FALSE,FALSE,FALSE,,,,0,Assets/Prefabs/TempGroundObject.prefab,

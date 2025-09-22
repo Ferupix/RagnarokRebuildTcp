@@ -12,6 +12,8 @@ using Assets.Scripts.Effects.EffectHandlers.Environment;
 using Assets.Scripts.Effects.EffectHandlers.General;
 using Assets.Scripts.Effects.EffectHandlers.Skills;
 using Assets.Scripts.Effects.EffectHandlers.Skills.Priest;
+using Assets.Scripts.Effects.EffectHandlers.Skills._ToS.Dievdirbys;
+using Assets.Scripts.Effects.EffectHandlers.Skills._ToS.Cleric;
 using Assets.Scripts.Misc;
 using Assets.Scripts.Network;
 using Assets.Scripts.Objects;
@@ -1090,12 +1092,13 @@ namespace Assets.Scripts.Sprites
                     StatueOfGoddessEffect.LaunchStatueOfGoddess(obj);
                     AttachPrefabToControllable(control, "Assets/Effects/Prefabs/StatueOfGoddessVakarine.prefab");
                     break;
-                    case NpcEffectType.StatueOfGoddessCarveOwl:
+                case NpcEffectType.StatueOfGoddessCarveOwl:
                     StatueOfGoddessEffect.LaunchStatueOfGoddess(obj);
                     AttachPrefabToControllable(control, "Assets/Effects/Prefabs/StatueOfGoddessCarveOwl.prefab");
-                    //DummyGroundEffect.Create(obj, "StatueOfGoddess");
                     break;
-                    
+                case NpcEffectType.HealCleric:
+                    HealClericEffect.Create(control);
+                    break;
             }
 
             return control;

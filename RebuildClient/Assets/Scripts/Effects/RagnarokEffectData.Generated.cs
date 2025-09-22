@@ -57,6 +57,7 @@ namespace Assets.Scripts.Effects
 		WaterBallAttack,
 		WaterBallRise,
 		StatueOfGoddess,
+		HealCleric,
 		Aspersio,
 		ImpositioManus,
 		LexAeterna,
@@ -161,7 +162,8 @@ namespace Assets.Scripts.Effects
 			effectHandlers.Add(EffectType.LordOfVermilion, new Assets.Scripts.Effects.EffectHandlers.Skills.LordOfVermilionEffect());
 			effectHandlers.Add(EffectType.WaterBallAttack, new Assets.Scripts.Effects.EffectHandlers.Skills.WaterBallAttackEffect());
 			effectHandlers.Add(EffectType.WaterBallRise, new Assets.Scripts.Effects.EffectHandlers.Skills.WaterBallRiseEffect());
-			effectHandlers.Add(EffectType.StatueOfGoddess, new Assets.Scripts.Effects.EffectHandlers.Skills.StatueOfGoddessEffect());
+			effectHandlers.Add(EffectType.StatueOfGoddess, new Assets.Scripts.Effects.EffectHandlers.Skills._ToS.Dievdirbys.StatueOfGoddessEffect());
+			effectHandlers.Add(EffectType.HealCleric, new Assets.Scripts.Effects.EffectHandlers.Skills._ToS.Cleric.HealClericEffect());
 			effectHandlers.Add(EffectType.Aspersio, new Assets.Scripts.Effects.EffectHandlers.Skills.Priest.AspersioEffect());
 			effectHandlers.Add(EffectType.ImpositioManus, new Assets.Scripts.Effects.EffectHandlers.Skills.Priest.ImpositioEffect());
 			effectHandlers.Add(EffectType.LexAeterna, new Assets.Scripts.Effects.EffectHandlers.Skills.Priest.LexAeternaEffect());

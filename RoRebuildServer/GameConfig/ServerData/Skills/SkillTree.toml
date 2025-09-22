@@ -73,6 +73,7 @@ SignumCrusis = [["DemonBane", 3]]
 AquaBenedicta = []
 StatueOfGoddessVakarine = []
 StatueOfGoddessCarveOwl = []
+HealCleric = []
 
 [Thief]
 JobRank = 1

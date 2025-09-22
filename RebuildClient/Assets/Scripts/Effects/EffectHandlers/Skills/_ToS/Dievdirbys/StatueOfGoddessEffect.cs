@@ -4,7 +4,7 @@ using Assets.Scripts.Network;
 using Assets.Scripts.Sprites;
 using Assets.Scripts.Effects.PrimitiveData;
 
-namespace Assets.Scripts.Effects.EffectHandlers.Skills
+namespace Assets.Scripts.Effects.EffectHandlers.Skills._ToS.Dievdirbys
 {
     [RoEffect("StatueOfGoddess")]
     public class StatueOfGoddessEffect : IEffectHandler
