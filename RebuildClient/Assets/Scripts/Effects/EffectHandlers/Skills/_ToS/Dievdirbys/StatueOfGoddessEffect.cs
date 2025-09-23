@@ -3,6 +3,7 @@ using UnityEngine;
 using Assets.Scripts.Network;
 using Assets.Scripts.Sprites;
 using Assets.Scripts.Effects.PrimitiveData;
+using RebuildSharedData.Enum.EntityStats;
 
 namespace Assets.Scripts.Effects.EffectHandlers.Skills._ToS.Dievdirbys
 {
@@ -12,7 +13,7 @@ namespace Assets.Scripts.Effects.EffectHandlers.Skills._ToS.Dievdirbys
         public static Ragnarok3dEffect LaunchStatueOfGoddess(GameObject target)
         {
             ServerControllable src = target.GetComponent<ServerControllable>();
-            //src.AttachEffect(CastEffect.Create(1f, target, AttackElement.Holy));
+            src.AttachEffect(CastEffect.Create(1f, target, AttackElement.Holy));
             
             var mat = EffectSharedMaterialManager.GetMaterial(EffectMaterialType.MapPillarBlue);
             
@@ -22,7 +23,7 @@ namespace Assets.Scripts.Effects.EffectHandlers.Skills._ToS.Dievdirbys
             effect.DestroyOnTargetLost = false;
             effect.transform.position = target.transform.position;
             effect.transform.localScale = new Vector3(1, 1, 1);
-            //effect.UpdateOnlyOnFrameChange = true; // ToDo: Test more
+            effect.UpdateOnlyOnFrameChange = true;
             effect.Flags[0] = 0;
             float scale = 6f;
             

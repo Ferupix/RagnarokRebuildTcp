@@ -1087,6 +1087,7 @@ namespace Assets.Scripts.Sprites
                     AttachPrefabToControllable(control, "Assets/Effects/Prefabs/ModelTalkieBox.prefab");
                     break;
                 case NpcEffectType.StatueOfGoddessWoodBlock:
+                    control.IsAttackable = true;
                     break;
                 case NpcEffectType.StatueOfGoddessVakarine:
                     StatueOfGoddessEffect.LaunchStatueOfGoddess(obj);

@@ -27,6 +27,9 @@ namespace Assets.Scripts.PlayerControl
 
         private static void UpdateColorForStatus(ServerControllable src)
         {
+            if (src.SpriteAnimator == null)
+                return;
+
             var color = Color.white;
             var priority = -1;
             
@@ -244,20 +247,17 @@ namespace Assets.Scripts.PlayerControl
                     obj2.transform.localPosition = offset;
                     obj2.transform.rotation = Quaternion.Euler(0f, RoAnimationHelper.FacingDirectionToRotation(Direction.South), 0f); // ToDo: Remove this and move above to localpositon + offset? Is FacingDirection even needed?
 
-                    var sprite = obj2.GetComponent<RoSpriteAnimator>();
-                    if (sprite != null)
-                        sprite.Controllable = target;
+                    // Add components to make it targetable by CameraFollower
+                    obj2.layer = LayerMask.NameToLayer("Characters");
+                    obj2.AddComponent<MeshCollider>();                    
+                    RoSpriteAnimator targetableAnimator = obj2.AddComponent<RoSpriteAnimator>();
+                    targetableAnimator.Controllable = target;
                     target.EntityObject = obj2;
 
                     // Remove billboard from 3D prefabs
                     GameObject.Destroy(target.gameObject.GetComponent<BillboardObject>());
                 }
             };
-
-            // Hide sprite and set as targetable while hidden
-            RoSpriteAnimator roa = target.gameObject.transform.GetChild(0).GetComponent<RoSpriteAnimator>();
-            roa.IsHidden = true;
-            roa.CanBeTargetedWhileHidden = true;
         }
 
         private static void DetachPrefabFromControllable(ServerControllable target)

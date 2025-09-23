@@ -5,7 +5,6 @@ using RoRebuildServer.EntityComponents.Npcs;
 using RoRebuildServer.Simulation.Items;
 using RoRebuildServer.Simulation.Skills.SkillHandlers.Mage;
 using RoRebuildServer.Simulation.Skills.SkillHandlers.Wizard;
-using RoRebuildServer.Simulation.Util;
 
 namespace RoRebuildServer.Simulation.Skills.SkillHandlers.Acolyte
 {
@@ -25,6 +24,7 @@ namespace RoRebuildServer.Simulation.Skills.SkillHandlers.Acolyte
         protected override NpcEffectType EffectType() => NpcEffectType.StatueOfGoddessCarveOwl;
 
         protected override float Duration(int skillLevel) => 30f; // ToDo: review duration
+        protected override bool AllowAutoAttackMove => true;
 
         public override void OnNaturalExpiration(Npc npc)
         {
@@ -40,41 +40,18 @@ namespace RoRebuildServer.Simulation.Skills.SkillHandlers.Acolyte
             switch (npc.ValuesInt[1])
             {
                 case 1:
-                    using (var targetList = EntityListPool.Get())
-                    {
-                        // ToDo: Placeholder for Storm Gust = Inneficient command FrostDiver
-                        // ToDo: change first param when NPCs have a CombatEntity
-                        src.Character.Map!.GatherEnemiesInArea(src.Character, npc.SelfPosition, 3, targetList, false, true);
-
-                        foreach (var e in targetList)
-                        {
-                            FrostDiverHandler ice = new FrostDiverHandler();
-                            ice.Process(src, e.Get<CombatEntity>(), 10, true);
-                        }
-                    }
-                      
+                    HeavensDriveHandler earth = new HeavensDriveHandler();
+                    earth.Process(src, null!, npc.SelfPosition, 1, true, false); // ToDo: Animation doesn't play while player is moving
                     break;
                 case 2:
                     ThunderStormHandler thunder = new ThunderStormHandler();
                     thunder.Process(src, null!, npc.SelfPosition, 1, true, false);
                     break;
                 case 3:
-                    HeavensDriveHandler earth = new HeavensDriveHandler();
-                    earth.Process(src, null!, npc.SelfPosition, 1, true, false);
+                    // ToDo: Placeholder for Storm Gust (1cell)
                     break;
                 case 4:
-                    using (var targetList = EntityListPool.Get())
-                    {
-                        // ToDo: Placeholder for Meteor Storm = Inneficient command Fireball (also, laggy)
-                        // ToDo: change first param when NPCs have a CombatEntity
-                        src.Character.Map!.GatherEnemiesInArea(src.Character, npc.SelfPosition, 3, targetList, false, true);
-
-                        foreach (var e in targetList)
-                        {
-                            FireBallHandler fire = new FireBallHandler();
-                            fire.Process(src, e.Get<CombatEntity>(), 10, true);
-                        }
-                    }
+                    // ToDo: Placeholder for Meteor Storm (1cell)
                     break;
             }
 

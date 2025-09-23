@@ -109,7 +109,6 @@ namespace Assets.Scripts.Sprites
         public float MoveDistance;
 
         public bool IsHidden;
-        public bool CanBeTargetedWhileHidden;
         public bool HideShadow;
 
         private RoAction currentAction;

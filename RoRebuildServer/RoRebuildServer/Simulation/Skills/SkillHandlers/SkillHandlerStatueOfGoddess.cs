@@ -2,6 +2,7 @@
 using RebuildSharedData.Enum;
 using RebuildSharedData.Enum.EntityStats;
 using RoRebuildServer.EntityComponents;
+using RoRebuildServer.EntityComponents.Character;
 using RoRebuildServer.EntityComponents.Npcs;
 using RoRebuildServer.EntityComponents.Util;
 using RoRebuildServer.Logging;
@@ -51,18 +52,14 @@ namespace RoRebuildServer.Simulation.Skills.SkillHandlers
                 return false;
             }
 
-            if (!isIndirect) 
-            {
-                // Validate overlapping AoEs ONLY if the skill was manually cast
-                var distance = 0;
+            var distance = 0;
 
-                var effectiveArea = Area.CreateAroundPoint(position, distance);
-                if (map.DoesAreaOverlapWithTrapsOrCharacters(effectiveArea))
-                {
-                    if (source.Character.Type == CharacterType.Player)
-                        CommandBuilder.SkillFailed(source.Player, SkillValidationResult.TargetAreaOccupied);
-                    return false;
-                }
+            var effectiveArea = Area.CreateAroundPoint(position, distance);
+            if (map.DoesAreaOverlapWithTrapsOrCharacters(effectiveArea))
+            {
+                if (source.Character.Type == CharacterType.Player)
+                    CommandBuilder.SkillFailed(source.Player, SkillValidationResult.TargetAreaOccupied);
+                return false;
             }
 
             return true;
@@ -76,9 +73,9 @@ namespace RoRebuildServer.Simulation.Skills.SkillHandlers
 
             if (source.Character.Type == CharacterType.Player && !source.Player.TryRemoveItemFromInventory(Catalyst(), CatalystCount(), true))
                 return;
+
             var ch = source.Character;
 
-            EntitySystem.Entity e;
             int param1 = 0, param2 = 0, param3 = 0, param4 = 0;
             string paramString = string.Empty;
 
@@ -110,33 +107,10 @@ namespace RoRebuildServer.Simulation.Skills.SkillHandlers
                     break;
             }
 
-            e = World.Instance.CreateEvent(source.Entity, map, GroundUnitType(), position, param1, param2, param3, param4, paramString); 
+            var e = World.Instance.CreateEvent(source.Entity, map, GroundUnitType(), position, param1, param2, param3, param4, paramString, true);
 
-            Npc eventNpc = e.Get<Npc>();
-            eventNpc.SummonMobsNearby(1, "GREEN_PLANT", 0, 0);
-
-            // ToDo: encapsulate "wood block monster" code inside npc summon method
-            if (eventNpc.Mobs![0].TryGet<RoRebuildServer.EntityComponents.Monster>(out RoRebuildServer.EntityComponents.Monster mon))
-            {
-                // Removes EXP and Drops from monster (wood block placeholder)
-                mon.GivesExperience = false;
-                mon.Character.Name = "Wood"; // ToDo: Doesn't work
-                mon.SetStat(CharacterStat.Luk, 99);
-
-                //if(SkillType() == CharacterSkill.StatueOfGoddessCarveOwl) // ToDo: Send emote on skill start, after statue is done
-                //    mon.ForceSendEmote(29); // /gg
-            }
-            
-            if (eventNpc.Mobs![0].TryGet<CombatEntity>(out var ce))
-            {
-                // Adds a special status effect to ensure client knows what to draw over the monster sprite
-                ce.AddStatusEffect(StatusEffectState.NewStatusEffect(CharacterStatusEffect.WoodBlock1, int.MaxValue));
-                ce.SetStat(CharacterStat.MaxHp, 3);
-                ce.SetStat(CharacterStat.Hp, 3);
-            }
-
-            //eventNpc.ValuesInt[0] = source.Character.Id; // ToDo: OwnerId for other statues? (buff type)
-            //eventNpc.ValuesString[1] = SkillType().ToString();
+            BattleNpc evBattleNpc = e.Get<BattleNpc>();
+            evBattleNpc.Character.CombatEntity.AddStatusEffect(StatusEffectState.NewStatusEffect(CharacterStatusEffect.WoodBlock1, int.MaxValue));
 
             ch.AttachEvent(e);
             source.ApplyCooldownForSupportSkillAction();
@@ -151,51 +125,47 @@ namespace RoRebuildServer.Simulation.Skills.SkillHandlers
         protected abstract CharacterSkill SkillSource();
         protected abstract NpcEffectType EffectType();
         protected abstract float Duration(int skillLevel);
-
-        public override void OnMobKill(Npc npc)
-        {
-            switch (SkillSource())
-            {
-                case CharacterSkill.StatueOfGoddessVakarine:
-                    //npc.AreaSkillIndirect(npc.Character.Position, CharacterSkill.StatueOfGoddessVakarine, 1); // ToDo: Test other statues
-                    npc.ChangeEffectType(NpcEffectType.StatueOfGoddessVakarine);
-                    npc.StartTimer(1000);
-                    break;
-                case CharacterSkill.StatueOfGoddessCarveOwl:
-                    npc.ChangeEffectType(NpcEffectType.StatueOfGoddessCarveOwl);
-                    npc.StartTimer(2000);
-                    break;
-            }
-        }
+        protected virtual bool Attackable(Npc npc) { return npc.EffectType == NpcEffectType.StatueOfGoddessWoodBlock; }
+        protected virtual bool AllowAutoAttackMove => false;
 
         public override void InitEvent(Npc npc, int param1, int param2, int param3, int param4, string? paramString)
         {
-            if (paramString == null)
-                ServerLogger.LogErrorWithStackTrace($"Attempting to create StatueOfGoddessBaseEvent without a string parameter!");
+            if (npc.Character.Type != CharacterType.BattleNpc)
+                throw new Exception($"Cannot create StatueOfGoddessBaseEvent npc as it is not correctly assigned as a BattleNPC type.");
+
+            //if (paramString == null)
+            //    ServerLogger.LogErrorWithStackTrace($"Attempting to create StatueOfGoddessBaseEvent without a string parameter!");
 
             npc.RevealAsEffect(NpcEffectType.StatueOfGoddessWoodBlock, "StatueOfGoddessWoodBlock");
             npc.ValuesInt[0] = param1; // skill level
             npc.ValuesInt[1] = param2; // xPos for Vaka, skillRotationIndex for Owl
-            npc.ValuesInt[2] = param3; // yPos for Vaka
+            npc.ValuesInt[2] = param3; // yPos for Vaka //ToDo: why 0
             npc.ValuesInt[3] = param4; // usage counter for Vaka
+            npc.ValuesInt[4] = 0;
+            npc.ValuesInt[5] = 0;
             npc.ValuesString[0] = paramString!; // mapName for Vaka
 
             if (!npc.Owner.TryGet<WorldObject>(out var owner))
             {
-                ServerLogger.LogWarning($"Npc {npc.Character} running StatueOfGoddess init but does not have an owner.");
+                ServerLogger.LogWarning($"Npc {npc.Character} running StatueOfGoddessBaseEvent init but does not have an owner.");
                 return;
             }
 
-            int distance = 0;
-            float tickRate = 1f;
+            // Initialize the wood block CE
+            var ce = npc.Character.CombatEntity;
+            ce.SetStat(CharacterStat.MaxHp, 10);
+            ce.SetStat(CharacterStat.Hp, 10);
+
             TargetingInfo targeting = new TargetingInfo()
             {
                 Faction = owner.Type == CharacterType.Player ? 1 : 0,
                 Party = 0,
                 IsPvp = false,
-                SourceEntity = npc.Owner,
-                TargetingType = TargetingType.Player 
+                SourceEntity = npc.Owner
             };
+
+            int distance = 0;
+            float tickRate = 1f;
 
             switch (SkillSource())
             {
@@ -205,22 +175,80 @@ namespace RoRebuildServer.Simulation.Skills.SkillHandlers
                     break;
                 case CharacterSkill.StatueOfGoddessCarveOwl:
                     targeting.TargetingType = TargetingType.Enemies;
-                    tickRate = 0.25f;
-                    distance = 3; // ToDo: remove since ground AoE isn't used for damage anymore
                     npc.ValuesInt[1] = 1; // Initialize with the first skill to be cast by Owl
                     break;
             }
 
             var aoe = World.Instance.GetNewAreaOfEffect();
             aoe.Init(npc.Character, Area.CreateAroundPoint(npc.Character.Position, distance), AoeType.SpecialEffect, targeting, Duration(npc.ValuesInt[0]), tickRate, 0, 0);
-            aoe.TriggerOnFirstTouch = true; // ToDo: review
-            aoe.CheckStayTouching = true; // ToDo: review
+            aoe.TriggerOnFirstTouch = SkillSource() == CharacterSkill.StatueOfGoddessVakarine;
+            aoe.CheckStayTouching = SkillSource() == CharacterSkill.StatueOfGoddessVakarine; // Only Vaka needs to check (single cell warp)
             aoe.Class = AoEClass.StatueOfGoddess;
             aoe.SkillSource = SkillSource();
 
             npc.AreaOfEffect = aoe;
             npc.Character.Map!.CreateAreaOfEffect(aoe);
             npc.ExpireEventIfOwnerLeavesMap = true;
+        }
+
+        public override bool CanBeAttacked(Npc npc, BattleNpc battleNpc, CombatEntity attacker, CharacterSkill skill = CharacterSkill.None)
+        {
+            if (!Attackable(npc))
+                return false;
+            if (skill == CharacterSkill.None) return AllowAutoAttackMove;
+
+            var attr = SkillHandler.GetSkillAttributes(skill);
+            return attr.SkillTarget == SkillTarget.Ground && attr.SkillClassification == SkillClass.Physical;
+        }
+        public override void OnCalculateDamage(Npc npc, BattleNpc battleNpc, CombatEntity attacker, ref DamageInfo di)
+        {
+            // Let the unfinished statue be moved around by skills
+            if (di.AttackSkill != CharacterSkill.None && AllowAutoAttackMove)
+                di.KnockBack = 1;
+
+            if (npc.EffectType == NpcEffectType.StatueOfGoddessWoodBlock)
+            {
+                npc.ValuesInt[5]++;
+
+                // Allow 3 hits
+                if (npc.ValuesInt[5] >= 3)
+                {
+                    // Stop player's auto-attack motion
+                    attacker.Player.AutoAttackLock = false;
+                }
+            }
+        }
+
+        public override void OnApplyDamage(Npc npc, BattleNpc battleNpc, ref DamageInfo di)
+        {
+            di.Damage = 0;
+
+            if (di.KnockBack > 0 && npc.AreaOfEffect != null)
+            {
+                npc.Character.Map?.MoveAreaOfEffect(npc.AreaOfEffect, Area.CreateAroundPoint(npc.Character.Position, 1));
+            }
+
+            if (npc.EffectType == NpcEffectType.StatueOfGoddessWoodBlock)
+            {
+                if (npc.ValuesInt[5] >= 3)
+                {
+                    // Make finished statue untargetable by AoEs
+                    npc.Character.SetSpawnImmunity(9999f);
+
+                    // Finished statue effect begins
+                    switch (SkillSource())
+                    {
+                        case CharacterSkill.StatueOfGoddessVakarine:
+                            npc.ChangeEffectType(NpcEffectType.StatueOfGoddessVakarine);
+                            npc.StartTimer(1000);
+                            break;
+                        case CharacterSkill.StatueOfGoddessCarveOwl:
+                            npc.ChangeEffectType(NpcEffectType.StatueOfGoddessCarveOwl);
+                            npc.StartTimer(2000);
+                            break;
+                    }
+                }
+            }
         }
 
         public override void OnTimer(Npc npc, float lastTime, float newTime)
@@ -238,6 +266,7 @@ namespace RoRebuildServer.Simulation.Skills.SkillHandlers
             switch (SkillSource())
             {
                 case CharacterSkill.StatueOfGoddessVakarine:
+                    // End Vakarine after 10 activations
                     if (npc.ValuesInt[3] >= 10)
                     {
                         npc.EndEvent();
@@ -251,19 +280,21 @@ namespace RoRebuildServer.Simulation.Skills.SkillHandlers
                     }
                     break;
                 case CharacterSkill.StatueOfGoddessCarveOwl:
+                    // Trigger Owl every 2 seconds (timer 2000)
                     if (npc.Owner.TryGet<CombatEntity>(out var owner))
                     {
                         TriggerStatue(npc, owner, null, npc.ValuesInt[0]);
 
                         // Increment the skill rotation param loop (1~4) used by Owl
-                        npc.ValuesInt[1] = npc.ValuesInt[1] switch
-                        {
-                            1 => 2,
-                            2 => 3,
-                            3 => 4,
-                            4 => 1,
-                            _ => 1
-                        };
+                        npc.ValuesInt[1] = npc.ValuesInt[1] == 1 ? 2 : 1;
+                        //npc.ValuesInt[1] = npc.ValuesInt[1] switch // ToDo: uncomment
+                        //{
+                        //    1 => 2,
+                        //    2 => 3,
+                        //    3 => 4,
+                        //    4 => 1,
+                        //    _ => 1
+                        //};
                     }
                     break;
             }
@@ -278,7 +309,7 @@ namespace RoRebuildServer.Simulation.Skills.SkillHandlers
             switch (SkillSource())
             {
                 case CharacterSkill.StatueOfGoddessVakarine:
-                
+
                     if (!npc.Owner.TryGet<CombatEntity>(out var owner) || owner.Character.Map != npc.Character.Map)
                     {
                         npc.ValuesInt[3] = 10;

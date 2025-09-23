@@ -24,6 +24,7 @@ namespace RoRebuildServer.Simulation.Skills.SkillHandlers.Acolyte
         protected override NpcEffectType EffectType() => NpcEffectType.StatueOfGoddessVakarine;
 
         protected override float Duration(int skillLevel) => 180f; // ToDo: review duration
+        protected override bool AllowAutoAttackMove => true;
 
         public override void OnNaturalExpiration(Npc npc)
         {
